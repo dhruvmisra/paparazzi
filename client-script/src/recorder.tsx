@@ -1,27 +1,102 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useRef, useCallback } from "preact/hooks";
 import { useLocalStorage } from "react-use";
-import { TestFrequency, TestFrequencyOptions, TestRecorderState } from "./types";
+import { TestFrequency, TestFrequencyOptions, TestRecorderState, TestStep, TestStepType } from "./types";
 import "./recorder.css";
+import { CreateTest, CreateTestStep } from "./services";
+import { debounce, generateTestStepId } from "./utils";
 
 export function PaparazziRecorder() {
     const [recorderState, setRecorderState] = useLocalStorage("pprz-recorder-state", TestRecorderState.IDLE);
+    const [IsSettingsOpen, setIsSettingsOpen] = useState(false);
     const [testName, setTestName] = useLocalStorage("pprz-recorder-test-name", "");
     const [testFrequency, setTestFrequency] = useLocalStorage("pprz-recorder-test-frequency", TestFrequency.DAILY);
-    const [IsSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    const [currentTestId, setCurrentTestId] = useLocalStorage("pprz-recorder-current-test-id", "");
+    // Required to use testId in event listeners
+    const testId = useRef(currentTestId);
+
+    useEffect(() => {
+        testId.current = currentTestId;
+    }, [currentTestId]);
 
     useEffect(() => {
         if (recorderState === TestRecorderState.RECORDING) {
             setIsSettingsOpen(false);
+            addEventListeners();
         }
+        return () => {
+            if (recorderState === TestRecorderState.RECORDING) {
+                removeEventListeners();
+            }
+        };
     }, [recorderState]);
 
-    const startTest = () => {
+    const handleGlobalClick = useCallback(async (e: MouseEvent) => {
+        console.log(e);
+        console.log(testId.current);
+        const step: TestStep = {
+            id: generateTestStepId(),
+            createdAt: new Date().toISOString(), // TODO: change this to server_time
+            testId: testId.current!,
+            type: TestStepType.CLICK,
+            clickPosition: {
+                x: e.clientX,
+                y: e.clientY,
+            },
+        };
+        await CreateTestStep(step);
+    }, []);
+
+    const handleGlobalScroll = useCallback(async (e: Event) => {
+        console.log(e);
+        console.log(testId.current);
+        const step: TestStep = {
+            id: generateTestStepId(),
+            createdAt: new Date().toISOString(), // TODO: change this to server_time
+            testId: testId.current!,
+            type: TestStepType.SCROLL,
+            scrollPosition: {
+                x: window.scrollX,
+                y: window.scrollY,
+            },
+        };
+        await CreateTestStep(step);
+    }, []);
+
+    const addEventListeners = () => {
+        window.debouncedScrollHandler = debounce(handleGlobalScroll, 500);
+        document.addEventListener("click", handleGlobalClick);
+        document.addEventListener("scroll", window.debouncedScrollHandler);
+    };
+
+    const removeEventListeners = () => {
+        document.removeEventListener("click", handleGlobalClick);
+        if (window.debouncedScrollHandler) {
+            document.removeEventListener("scroll", window.debouncedScrollHandler);
+        }
+    };
+
+    const startTest = async () => {
+        setRecorderState(TestRecorderState.LOADING);
+        const testData = await CreateTest(testName ?? "", testFrequency ?? TestFrequency.DAILY);
+        setCurrentTestId(testData.id);
+        const navigationStep: TestStep = {
+            id: generateTestStepId(),
+            createdAt: new Date().toISOString(), // TODO: change this to server_time
+            testId: testData.id,
+            type: TestStepType.NAVIGATION,
+            location: {
+                url: window.location.href,
+            },
+        };
+        await CreateTestStep(navigationStep);
         setRecorderState(TestRecorderState.RECORDING);
     };
 
     const stopTest = () => {
-        setRecorderState(TestRecorderState.IDLE);
+        setCurrentTestId("");
         setTestName("");
+        setRecorderState(TestRecorderState.IDLE);
     };
 
     const handleSettingsSubmit = (e: SubmitEvent) => {
@@ -33,13 +108,13 @@ export function PaparazziRecorder() {
         <div className="pprz-recorder">
             <p className="pprz-title">PAPARAZZI</p>
             <div className="pprz-buttons">
-                {recorderState !== TestRecorderState.LOADING && (
+                {recorderState === TestRecorderState.LOADING && (
                     <div id="pprz-loading-overlay">
                         <span className="loader"></span>
                     </div>
                 )}
 
-                {recorderState === TestRecorderState.IDLE && (
+                {recorderState !== TestRecorderState.RECORDING && (
                     <button id="pprz-start-btn" onClick={startTest}>
                         <span className="icon">&#9658;</span>
                         Start
