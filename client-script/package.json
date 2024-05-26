@@ -15,7 +15,13 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
     "@types/node": "^20.12.12",
+    "msw": "^2.3.0",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

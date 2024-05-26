@@ -17,3 +17,20 @@ export enum TestFrequency {
 }
 
 export const TestFrequencyOptions = Object.values(TestFrequency);
+
+export type CreateTestRequest = {
+    name: string;
+    frequency: TestFrequency;
+    baseUrl: string;
+    device: DeviceInfo;
+};
+
+export type DeviceInfo = {
+    ua: string;
+};
+
+export type CreateTestResponse = CreateTestRequest & {
+    id: string;
+    createdAt: string;
+    state: TestState;
+};
