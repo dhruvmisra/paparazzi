@@ -1,0 +1,116 @@
+.pprz-recorder {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px;
+    border-radius: 12px;
+    background-color: #020617;
+    /* opacity: 0.4; */
+    transition: opacity 0.2s;
+}
+.pprz-recorder:hover {
+    opacity: 1;
+}
+.pprz-title {
+    color: #94a3b8;
+    text-align: center;
+    font-family: monospace;
+    margin-bottom: 4px;
+    margin-top: 0;
+}
+.pprz-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    gap: 6px;
+}
+.pprz-recorder button {
+    color: white;
+    background-color: #1e293b;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.pprz-recorder button:hover {
+    background-color: #475569;
+}
+.pprz-recorder button:disabled {
+    background-color: transparent;
+    color: #475569;
+    cursor: not-allowed;
+}
+.pprz-recorder button .icon {
+    margin-right: 6px;
+}
+
+/* loading */
+#pprz-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: none;
+}
+#pprz-loading-overlay .loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #ffffff;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: pprz-loader-rotation 1s linear infinite;
+}
+@keyframes pprz-loader-rotation {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* settings */
+#pprz-settings {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background-color: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 6px;
+    padding: 6px;
+    display: none;
+}
+#pprz-settings.open {
+    display: block;
+}
+#pprz-settings form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: white;
+}
+#pprz-settings input,
+#pprz-settings select {
+    background-color: #1e293b;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+}
+#pprz-settings label {
+    font-family: sans-serif;
+    margin-top: 12px;
+    font-size: 0.8rem;
+}
