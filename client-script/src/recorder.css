@@ -8,6 +8,7 @@
     background-color: #020617;
     /* opacity: 0.4; */
     transition: opacity 0.2s;
+    z-index: 10000;
 }
 .pprz-recorder:hover {
     opacity: 1;
@@ -56,7 +57,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 1000;
-    display: none;
 }
 #pprz-loading-overlay .loader {
     position: absolute;
