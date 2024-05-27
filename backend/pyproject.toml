@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "paparazzi-backend"
+version = "0.0.0"
+description = "Automated UI screenshots and comparison system"
+authors = ["dhruvmisra <dhruvmisra@live.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+fastapi = "^0.111.0"
+pynamodb = "^6.0.0"
+secure = "^0.3.0"
+asgi-correlation-id = "^4.3.1"
+ecs-logging = "^2.1.0"
+celery = {extras = ["sqs"], version = "^5.4.0"}
+coloredlogs = "^15.0.1"
+gunicorn = "^22.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.6.0"
+mypy = "^0.971"
+pytest = "^7.1.2"
+ruff = "^0.1.6"
+
+[tool.ruff]
+src = ["src", "test"]
+target-version = "py310"
+select = ["E", "F", "W", "I"]
+ignore = ["F403", "F405", "E501", "E711"]
+line-length = 99
+ignore-init-module-imports = true
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pypackages__",
+    "__init__.py",
+    "venv",
+    "migrations",
+]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.black]
+line-length = 99
+target-version = ['py310']
+
+[tool.mypy]
+mypy_path = "src"
+files = "src/**/*.py,test/**/*.py"
+namespace_packages = true
+explicit_package_bases = true
+ignore_missing_imports = true
+install_types = true
+non_interactive = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

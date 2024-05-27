@@ -1,0 +1,24 @@
+from celery import Celery
+from kombu import Queue
+
+from config import DEBUG, SQS_QUEUE_NAME, SQS_QUEUE_URL
+
+celery_config = {
+    "broker_url": f"sqs://@{SQS_QUEUE_URL.split('://')[1]}",
+    "broker_transport_options": {"visibility_timeout": 36000, "region": "ap-south-1"},
+    "task_default_queue": SQS_QUEUE_NAME,
+    "broker_connection_retry_on_startup": True,
+    "task_queues": [
+        Queue(SQS_QUEUE_NAME, broker=SQS_QUEUE_URL),
+    ],
+}
+
+if not DEBUG:
+    celery_config["broker_transport_options"]["predefined_queues"] = {
+        SQS_QUEUE_NAME: {
+            "url": SQS_QUEUE_URL,
+        }
+    }
+
+celery_app = Celery(__name__, include=["jobs.tasks"])
+celery_app.config_from_object(celery_config)

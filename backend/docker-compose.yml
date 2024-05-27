@@ -1,0 +1,55 @@
+services:
+    backend:
+        build:
+            context: .
+            dockerfile: ./docker/server/Dockerfile
+        container_name: backend
+        env_file:
+            - .env.development
+        ports:
+            - 3000:3000
+
+    worker:
+        build:
+            context: .
+            dockerfile: ./docker/worker/Dockerfile
+        container_name: worker
+        env_file:
+            - .env.development
+        network_mode: "host"
+        depends_on:
+            localstack:
+                condition: service_healthy
+
+    cron:
+        build:
+            context: .
+            dockerfile: ./docker/beat/Dockerfile
+        container_name: cron
+        env_file:
+            - .env.development
+        network_mode: "host"
+        depends_on:
+            localstack:
+                condition: service_healthy
+
+    localstack:
+        image: localstack/localstack:latest
+        environment:
+            - SERVICES=sqs,s3,dynamodb
+            - AWS_DEFAULT_REGION=ap-south-1
+        healthcheck:
+            test:
+                - CMD
+                - bash
+                - -c
+                - awslocal sqs list-queues
+            interval: 10s
+            timeout: 15s
+            start_period: 15s
+        ports:
+            - "127.0.0.1:4566:4566"            # LocalStack Gateway
+            - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+        volumes:
+            - "${TMPDIR:-/tmp/localstack}:/var/lib/localstack"
+            - "/var/run/docker.sock:/var/run/docker.sock"
