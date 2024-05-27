@@ -1,6 +1,7 @@
 import path from "path";
 import { defineConfig } from "vite";
 import preact from "@preact/preset-vite";
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import packageJson from "./package.json";
 
 const getPackageName = () => {
@@ -33,5 +34,7 @@ export default defineConfig({
       fileName: (format) => fileName[format],
     },
   },
-  plugins: [preact()],
+  plugins: [
+    preact(), cssInjectedByJsPlugin(),
+  ],
 });

@@ -28,6 +28,9 @@ devDependencies:
   vite:
     specifier: ^5.2.0
     version: 5.2.11(@types/node@20.12.12)
+  vite-plugin-css-injected-by-js:
+    specifier: ^3.5.1
+    version: 3.5.1(vite@5.2.11)
 
 packages:
 
@@ -1630,6 +1633,14 @@ packages:
       browserslist: 4.23.0
       escalade: 3.1.2
       picocolors: 1.0.1
+    dev: true
+
+  /vite-plugin-css-injected-by-js@3.5.1(vite@5.2.11):
+    resolution: {integrity: sha512-9ioqwDuEBxW55gNoWFEDhfLTrVKXEEZgl5adhWmmqa88EQGKfTmexy4v1Rh0pAS6RhKQs2bUYQArprB32JpUZQ==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dependencies:
+      vite: 5.2.11(@types/node@20.12.12)
     dev: true
 
   /vite@5.2.11(@types/node@20.12.12):
