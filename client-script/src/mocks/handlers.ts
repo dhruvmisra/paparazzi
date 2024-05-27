@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { BACKEND_URL } from "../config";
-import { CreateTestRequest, Test, TestFrequency, TestParams, TestState, TestStep } from "../types";
+import { CreateTestRequest, Test, TestFrequency, TestParams, TestState, TestStep, TestStepScreenshotParams, TestStepScreenshotResponse } from "../types";
 import { generateTestId, generateTestStepId } from "../utils";
 
 export const handlers = [
@@ -73,8 +73,18 @@ export const handlers = [
             location: req.location,
             scrollPosition: req.scrollPosition,
             clickPosition: req.clickPosition,
-            screenshotPath: req.screenshotPath,
         };
         return HttpResponse.json(res, { status: 201 });
     }),
+
+    http.post<TestStepScreenshotParams, {}, TestStepScreenshotResponse>(
+        `${BACKEND_URL}/v1/tests/:testId/steps/:testStepId/screenshots`,
+        async () => {
+            const res = {
+                message: "Screenshot uploaded successfully",
+                url: "https://localhost:5173/screenshots/1.png",
+            };
+            return HttpResponse.json(res, { status: 201 });
+        }
+    ),
 ];
