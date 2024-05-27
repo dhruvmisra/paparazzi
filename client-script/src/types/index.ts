@@ -2,13 +2,12 @@ export enum TestRecorderState {
     IDLE = "IDLE",
     LOADING = "LOADING",
     RECORDING = "RECORDING",
+    FAILED = "FAILED",
 }
 
 export enum TestState {
-    INITIALIZING = "INITIALIZING",
-    RUNNING = "RUNNING",
-    COMPLETED = "COMPLETED",
-    FAILED = "FAILED",
+    RECORDING = "RECORDING",
+    RECORDED = "RECORDED",
 }
 
 export enum TestFrequency {

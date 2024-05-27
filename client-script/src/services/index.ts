@@ -1,2 +1,2 @@
 export { CheckHealth, CreateTest, GetTest } from "./test";
-export { CreateTestStep } from "./step";
+export { constructClickStep, constructScrollStep, CreateTestStep } from "./step";

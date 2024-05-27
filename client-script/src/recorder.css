@@ -8,6 +8,7 @@
     background-color: #020617;
     /* opacity: 0.4; */
     transition: opacity 0.2s;
+    z-index: 10000;
 }
 .pprz-recorder:hover {
     opacity: 1;

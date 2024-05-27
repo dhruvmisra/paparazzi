@@ -1,19 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from "preact/hooks";
-import { useLocalStorage } from "react-use";
-import { TestFrequency, TestFrequencyOptions, TestRecorderState, TestStep, TestStepType } from "./types";
+import { useEffectOnce, useLocalStorage } from "react-use";
+import { TestFrequency, TestFrequencyOptions, TestRecorderState } from "./types";
+import { constructClickStep, constructScrollStep, CreateTest, CreateTestStep } from "./services";
+import { debounce } from "./utils";
 import "./recorder.css";
-import { CreateTest, CreateTestStep } from "./services";
-import { debounce, generateTestStepId } from "./utils";
+import { CompleteTest } from "./services/test";
+import { constructNavigationStep } from "./services/step";
 
 export function PaparazziRecorder() {
     const [recorderState, setRecorderState] = useLocalStorage("pprz-recorder-state", TestRecorderState.IDLE);
-    const [IsSettingsOpen, setIsSettingsOpen] = useState(false);
     const [testName, setTestName] = useLocalStorage("pprz-recorder-test-name", "");
     const [testFrequency, setTestFrequency] = useLocalStorage("pprz-recorder-test-frequency", TestFrequency.DAILY);
+    const [IsSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const [currentTestId, setCurrentTestId] = useLocalStorage("pprz-recorder-current-test-id", "");
     // Required to use testId in event listeners
     const testId = useRef(currentTestId);
+
+    useEffectOnce(() => {
+        if (recorderState === TestRecorderState.LOADING) {
+            setRecorderState(TestRecorderState.IDLE);
+        }
+    });
 
     useEffect(() => {
         testId.current = currentTestId;
@@ -32,34 +40,19 @@ export function PaparazziRecorder() {
     }, [recorderState]);
 
     const handleGlobalClick = useCallback(async (e: MouseEvent) => {
+        if ((e.target as HTMLInputElement).id === "pprz-stop-btn") {
+            return;
+        }
         console.log(e);
         console.log(testId.current);
-        const step: TestStep = {
-            id: generateTestStepId(),
-            createdAt: new Date().toISOString(), // TODO: change this to server_time
-            testId: testId.current!,
-            type: TestStepType.CLICK,
-            clickPosition: {
-                x: e.clientX,
-                y: e.clientY,
-            },
-        };
+        const step = constructClickStep(testId.current!, e);
         await CreateTestStep(step);
     }, []);
 
     const handleGlobalScroll = useCallback(async (e: Event) => {
         console.log(e);
         console.log(testId.current);
-        const step: TestStep = {
-            id: generateTestStepId(),
-            createdAt: new Date().toISOString(), // TODO: change this to server_time
-            testId: testId.current!,
-            type: TestStepType.SCROLL,
-            scrollPosition: {
-                x: window.scrollX,
-                y: window.scrollY,
-            },
-        };
+        const step = constructScrollStep(testId.current!, e);
         await CreateTestStep(step);
     }, []);
 
@@ -71,29 +64,21 @@ export function PaparazziRecorder() {
 
     const removeEventListeners = () => {
         document.removeEventListener("click", handleGlobalClick);
-        if (window.debouncedScrollHandler) {
-            document.removeEventListener("scroll", window.debouncedScrollHandler);
-        }
+        window.debouncedScrollHandler && document.removeEventListener("scroll", window.debouncedScrollHandler);
     };
 
     const startTest = async () => {
         setRecorderState(TestRecorderState.LOADING);
         const testData = await CreateTest(testName ?? "", testFrequency ?? TestFrequency.DAILY);
         setCurrentTestId(testData.id);
-        const navigationStep: TestStep = {
-            id: generateTestStepId(),
-            createdAt: new Date().toISOString(), // TODO: change this to server_time
-            testId: testData.id,
-            type: TestStepType.NAVIGATION,
-            location: {
-                url: window.location.href,
-            },
-        };
+        // initial navigation step
+        const navigationStep = constructNavigationStep(testData.id, window.location.href);
         await CreateTestStep(navigationStep);
         setRecorderState(TestRecorderState.RECORDING);
     };
 
-    const stopTest = () => {
+    const stopTest = async () => {
+        await CompleteTest(currentTestId!);
         setCurrentTestId("");
         setTestName("");
         setRecorderState(TestRecorderState.IDLE);

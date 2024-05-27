@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../config";
-import { TestFrequency, CreateTestRequest, Test } from "../types";
+import { TestFrequency, CreateTestRequest, Test, TestState } from "../types";
 
 export const CheckHealth = async () => {
     const response = await fetch(`${BACKEND_URL}/v1/health`);
@@ -35,4 +35,19 @@ export const GetTest = async (testId: string) => {
     const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}`);
     return response.json() as Promise<Test>;
 };
+
+export const CompleteTest = async (testId: string) => {
+    const body = {
+        state: TestState.RECORDED
+    }
+    const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+    });
+
+    return response.json() as Promise<Test>;
+}
 
