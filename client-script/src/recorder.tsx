@@ -5,7 +5,7 @@ import { constructClickStep, constructScrollStep, CreateTest, CreateTestStep } f
 import { debounce } from "./utils";
 import "./recorder.css";
 import { CompleteTest } from "./services/test";
-import { constructNavigationStep } from "./services/step";
+import { TakeScreenshotAndCreateStep, constructNavigationStep } from "./services/step";
 
 export function PaparazziRecorder() {
     const [recorderState, setRecorderState] = useLocalStorage("pprz-recorder-state", TestRecorderState.IDLE);
@@ -45,8 +45,9 @@ export function PaparazziRecorder() {
         }
         console.log(e);
         console.log(testId.current);
-        const step = constructClickStep(testId.current!, e);
+        let step = constructClickStep(testId.current!, e);
         await CreateTestStep(step);
+        await TakeScreenshotAndCreateStep(testId.current!);
     }, []);
 
     const handleGlobalScroll = useCallback(async (e: Event) => {
@@ -54,6 +55,7 @@ export function PaparazziRecorder() {
         console.log(testId.current);
         const step = constructScrollStep(testId.current!, e);
         await CreateTestStep(step);
+        await TakeScreenshotAndCreateStep(testId.current!);
     }, []);
 
     const addEventListeners = () => {

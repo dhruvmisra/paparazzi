@@ -69,5 +69,15 @@ export type TestStep = {
         x: number;
         y: number;
     };
-    screenshotPath?: string;
 };
+
+// TestStep screenshot
+export type TestStepScreenshotParams = {
+    testId: string;
+    testStepId: string;
+}
+
+export type TestStepScreenshotResponse = {
+    message: string;
+    url: string;
+}
