@@ -28,7 +28,7 @@ DEFAULT_LOG_FIELDS = {"server": "paparazzi", "env": ENVIRONMENT, "version": VERS
 
 AWS_REGION = getenv("AWS_REGION", "ap-south-1")
 
-DB_HOST = getenv("DB_HOST")
+DB_ENDPOINT = getenv("DB_ENDPOINT")
 
 SQS_QUEUE_URL = getenv("SQS_QUEUE_URL")
 SQS_QUEUE_NAME = getenv("SQS_QUEUE_NAME")
