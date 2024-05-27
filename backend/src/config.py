@@ -1,5 +1,10 @@
 import os
+from pathlib import Path
 
+from dotenv import load_dotenv
+
+env_path = Path(".") / ".env"
+load_dotenv(verbose=True, dotenv_path=env_path)
 
 # os.getenv but also raises error for required variables
 def getenv(name, default=None, required=True):
@@ -21,5 +26,10 @@ STRUCTURED_LOGGING = getenv("STRUCTURED_LOGGING", "false").lower() == "true"
 LOG_LEVEL = getenv("LOG_LEVEL", "DEBUG")
 DEFAULT_LOG_FIELDS = {"server": "paparazzi", "env": ENVIRONMENT, "version": VERSION}
 
+AWS_REGION = getenv("AWS_REGION", "ap-south-1")
+
+DB_HOST = getenv("DB_HOST")
+
 SQS_QUEUE_URL = getenv("SQS_QUEUE_URL")
 SQS_QUEUE_NAME = getenv("SQS_QUEUE_NAME")
+

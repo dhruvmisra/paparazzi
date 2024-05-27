@@ -2,8 +2,14 @@ SHELL := /bin/bash
 
 -include ./.env.development
 
+services:
+	@docker-compose up worker cron localstack --force-recreate --remove-orphans
+
 start:
 	@docker-compose up --force-recreate --remove-orphans
+
+watch:
+	@docker-compose watch --no-up & docker-compose up --force-recreate --remove-orphans
 
 rebuild:
 	@docker-compose build

@@ -5,9 +5,20 @@ services:
             dockerfile: ./docker/server/Dockerfile
         container_name: backend
         env_file:
-            - .env.development
+            - .env
         ports:
             - 3000:3000
+        develop:
+            watch:
+                - action: sync+restart
+                  path: ./src
+                  target: /app/src
+                - action: rebuild
+                  path: ./pyproject.toml
+                  target: /app/pyproject.toml
+                - action: sync+restart
+                  path: ./.env
+                  target: /app/.env
 
     worker:
         build:
@@ -15,11 +26,22 @@ services:
             dockerfile: ./docker/worker/Dockerfile
         container_name: worker
         env_file:
-            - .env.development
+            - .env
         network_mode: "host"
         depends_on:
             localstack:
                 condition: service_healthy
+        develop:
+            watch:
+                - action: sync+restart
+                  path: ./src
+                  target: /app/src
+                - action: rebuild
+                  path: ./pyproject.toml
+                  target: /app/pyproject.toml
+                - action: sync+restart
+                  path: ./.env
+                  target: /app/.env
 
     cron:
         build:
@@ -27,14 +49,26 @@ services:
             dockerfile: ./docker/beat/Dockerfile
         container_name: cron
         env_file:
-            - .env.development
+            - .env
         network_mode: "host"
         depends_on:
             localstack:
                 condition: service_healthy
+        develop:
+            watch:
+                - action: sync+restart
+                  path: ./src
+                  target: /app/src
+                - action: rebuild
+                  path: ./pyproject.toml
+                  target: /app/pyproject.toml
+                - action: sync+restart
+                  path: ./.env
+                  target: /app/.env
 
     localstack:
         image: localstack/localstack:latest
+        container_name: "${LOCALSTACK_DOCKER_NAME:-localstack}"
         environment:
             - SERVICES=sqs,s3,dynamodb
             - AWS_DEFAULT_REGION=ap-south-1
@@ -43,7 +77,7 @@ services:
                 - CMD
                 - bash
                 - -c
-                - awslocal sqs list-queues
+                - awslocal sqs list-queues && awslocal s3 ls && awslocal dynamodb list-tables
             interval: 10s
             timeout: 15s
             start_period: 15s
@@ -51,5 +85,5 @@ services:
             - "127.0.0.1:4566:4566"            # LocalStack Gateway
             - "127.0.0.1:4510-4559:4510-4559"  # external services port range
         volumes:
-            - "${TMPDIR:-/tmp/localstack}:/var/lib/localstack"
+            - "${LOCALSTACK_VOLUME_DIR:-/tmp/localstack}:/var/lib/localstack"
             - "/var/run/docker.sock:/var/run/docker.sock"
