@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import config
 from exceptions import add_exception_handlers
 from log import log
-from resources import health, test
+from resources import health, step, test
 from util.security_headers import add_security_headers
 
 log.warning("██████╗  █████╗ ██████╗  █████╗ ██████╗  █████╗ ███████╗███████╗██╗")
@@ -42,4 +42,5 @@ add_exception_handlers(app)
 api_router = APIRouter(prefix="/v1")
 api_router.include_router(health.router, prefix="/health", tags=["health"])
 api_router.include_router(test.router, prefix="/tests", tags=["test"])
+api_router.include_router(step.router, prefix="/tests", tags=["test-step"])
 app.include_router(api_router)
