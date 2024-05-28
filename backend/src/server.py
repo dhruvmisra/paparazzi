@@ -28,7 +28,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["OPTIONS", "GET", "POST", "PATCH", "PUT", "DELETE"],
     allow_headers=[
+        "x-user-id",
         "Authorization",
+        "Content-Type",
         "Connection",
         "User-Agent",
         "Origin",
