@@ -6,8 +6,8 @@ from config import DEBUG, SQS_QUEUE_NAME, SQS_QUEUE_URL
 celery_config = {
     "broker_url": f"sqs://@{SQS_QUEUE_URL.split('://')[1]}",
     "broker_transport_options": {"visibility_timeout": 36000, "region": "ap-south-1"},
-    "task_default_queue": SQS_QUEUE_NAME,
     "broker_connection_retry_on_startup": True,
+    "task_default_queue": SQS_QUEUE_NAME,
     "task_queues": [
         Queue(SQS_QUEUE_NAME, broker=SQS_QUEUE_URL),
     ],

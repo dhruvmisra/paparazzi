@@ -23,9 +23,7 @@ async def create_test(
 ):
     try:
         log.info(f"Creating test for user_id: {user_id}")
-        data = TestDBInput(
-            user_id=user_id, state=TestState.RECORDING, **request.dict()
-        )
+        data = TestDBInput(user_id=user_id, state=TestState.RECORDING, **request.dict())
         item = TestRepository().create(data)
         return TestResponse(**item.dict())
     except ApplicationException as e:
@@ -63,6 +61,7 @@ async def get_test(
         raise e
     except Exception as e:
         InternalServerException(e)
+
 
 @router.patch("/{test_id}", response_model=TestResponse)
 async def update_test(
