@@ -28,4 +28,4 @@ class TestRunTable(BaseModel):
 
 
 if not TestRunTable.exists():
-    TestRunTable.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+    TestRunTable.create_table(read_capacity_units=5, write_capacity_units=5, wait=True)
