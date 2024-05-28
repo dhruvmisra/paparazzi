@@ -12,7 +12,6 @@ from exceptions import (
 from log import log
 from repositories import TestRepository
 from schemas import CreateTestRequest, TestDBInput, TestResponse, UpdateTestRequest
-from util.id import generate_test_id
 
 router = APIRouter()
 
@@ -25,7 +24,7 @@ async def create_test(
     try:
         log.info(f"Creating test for user_id: {user_id}")
         data = TestDBInput(
-            user_id=user_id, id=generate_test_id(), state=TestState.RECORDING, **request.dict()
+            user_id=user_id, state=TestState.RECORDING, **request.dict()
         )
         item = TestRepository().create(data)
         return TestResponse(**item.dict())
