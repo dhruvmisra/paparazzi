@@ -1,0 +1,21 @@
+services:
+    backend:
+        image: 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-backend:latest
+        container_name: backend
+        network_mode: "host"
+        env_file:
+            - .env
+
+    worker:
+        image: 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-worker:latest
+        container_name: worker
+        network_mode: "host"
+        env_file:
+            - .env
+
+    scheduler:
+        image: 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-scheduler:latest
+        container_name: scheduler
+        network_mode: "host"
+        env_file:
+            - .env

@@ -3,7 +3,7 @@ SHELL := /bin/bash
 -include ./.env.development
 
 services:
-	@docker-compose up worker cron localstack --force-recreate --remove-orphans
+	@docker-compose up worker scheduler localstack --force-recreate --remove-orphans
 
 start:
 	@docker-compose up --force-recreate --remove-orphans
@@ -34,15 +34,25 @@ build.worker:
 build.beat:
 	@docker build -f docker/beat/Dockerfile -t paparazzi-beat:latest .
 
+aws.login:
+	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 402963518398.dkr.ecr.us-east-1.amazonaws.com
+
 push.server:
-	@docker tag paparazzi-server:latest $(DOCKER_REGISTRY)/paparazzi-server:latest
-	@docker push $(DOCKER_REGISTRY)/paparazzi-server:latest
+	@docker tag paparazzi-server:latest 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-backend:latest
+	@docker push 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-backend:latest
 
 push.worker:
-	@docker tag paparazzi-worker:latest $(DOCKER_REGISTRY)/paparazzi-worker:latest
-	@docker push $(DOCKER_REGISTRY)/paparazzi-worker:latest
+	@docker tag paparazzi-worker:latest 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-worker:latest
+	@docker push 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-worker:latest
 
 push.beat:
-	@docker tag paparazzi-beat:latest $(DOCKER_REGISTRY)/paparazzi-beat:latest
-	@docker push $(DOCKER_REGISTRY)/paparazzi-beat:latest
+	@docker tag paparazzi-beat:latest 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-scheduler:latest
+	@docker push 402963518398.dkr.ecr.us-east-1.amazonaws.com/paparazzi-scheduler:latest
 
+build-and-push-all:
+	@make build.server
+	@make build.worker
+	@make build.beat
+	@make push.server
+	@make push.worker
+	@make push.beat
