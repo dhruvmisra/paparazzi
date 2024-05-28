@@ -51,4 +51,3 @@ class TestStepResponse(CreateTestStepRequest):
 class UploadScreenshotResponse(BaseSchema):
     url: str
     message: str = "Screenshot uploaded successfully"
-

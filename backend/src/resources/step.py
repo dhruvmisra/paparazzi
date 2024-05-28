@@ -111,7 +111,9 @@ async def upload_test_step_screenshot(
             f"Uploading test step screenshot for user_id: {user_id}, test_id: {test_id}, step_id: {step_id}"
         )
         s3 = S3Helper(
-            endpoint_url=SCREENSHOTS_S3_BUCKET_ENDPOINT, region=AWS_REGION, bucket_name=SCREENSHOTS_S3_BUCKET_NAME
+            endpoint_url=SCREENSHOTS_S3_BUCKET_ENDPOINT,
+            region=AWS_REGION,
+            bucket_name=SCREENSHOTS_S3_BUCKET_NAME,
         )
         response = s3.upload_file(
             file_path=f"{user_id}/{test_id}", file_name=f"{step_id}.png", body=file
