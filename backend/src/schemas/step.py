@@ -47,3 +47,8 @@ class CreateTestStepResponse(BaseSchema):
 class TestStepResponse(CreateTestStepRequest):
     updated_at: datetime = Field(..., alias="updatedAt")
 
+
+class UploadScreenshotResponse(BaseSchema):
+    url: str
+    message: str = "Screenshot uploaded successfully"
+
