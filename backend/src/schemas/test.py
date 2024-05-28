@@ -27,20 +27,13 @@ class CreateTestRequest(BaseSchema):
 
 class TestDBInput(CreateTestRequest):
     user_id: str
-    id: str
     state: TestState
 
 
 class TestDB(TestDBInput):
+    id: str
     created_at: datetime
     updated_at: datetime
-
-
-class UpdateTestRequest(BaseSchema):
-    name: Optional[str] = None
-    frequency: Optional[TestFrequency] = None
-    base_url: Optional[str] = Field(None, alias="baseUrl")
-    state: Optional[TestState] = None
 
 
 class TestResponse(CreateTestRequest):
@@ -48,3 +41,10 @@ class TestResponse(CreateTestRequest):
     state: TestState
     created_at: datetime = Field(..., alias="createdAt")
     updated_at: datetime = Field(..., alias="updatedAt")
+
+
+class UpdateTestRequest(BaseSchema):
+    name: Optional[str] = None
+    frequency: Optional[TestFrequency] = None
+    base_url: Optional[str] = Field(None, alias="baseUrl")
+    state: Optional[TestState] = None
