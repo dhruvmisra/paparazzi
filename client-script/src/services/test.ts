@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL, USER_ID } from "../config";
 import { TestFrequency, CreateTestRequest, Test, TestState } from "../types";
 
 export const CheckHealth = async () => {
@@ -24,6 +24,7 @@ export const CreateTest = async (name: string, frequency: TestFrequency) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "x-user-id": USER_ID
         },
         body: JSON.stringify(body),
     });
@@ -32,7 +33,11 @@ export const CreateTest = async (name: string, frequency: TestFrequency) => {
 };
 
 export const GetTest = async (testId: string) => {
-    const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}`);
+    const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}`, {
+        headers: {
+            "x-user-id": USER_ID
+        }
+    });
     return response.json() as Promise<Test>;
 };
 
@@ -44,6 +49,7 @@ export const CompleteTest = async (testId: string) => {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
+            "x-user-id": USER_ID
         },
         body: JSON.stringify(body),
     });

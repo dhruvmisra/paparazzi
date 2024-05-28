@@ -30,7 +30,7 @@ class TestTable(BaseModel):
 
 
 if not TestTable.exists():
-    TestTable.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+    TestTable.create_table(read_capacity_units=5, write_capacity_units=5, wait=True)
 
 
 class FrequencyIndex(LocalSecondaryIndex):

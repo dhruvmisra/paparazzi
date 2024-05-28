@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL, USER_ID } from "../config";
 import { TestStep, TestStepType } from "../types";
 import { generateTestStepId, takeScreenshot } from "../utils";
 
@@ -58,6 +58,7 @@ export const CreateTestStep = async (testStep: TestStep) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "x-user-id": USER_ID,
         },
         body: JSON.stringify(testStep),
     });
@@ -66,9 +67,15 @@ export const CreateTestStep = async (testStep: TestStep) => {
 };
 
 export const CreateTestStepScreenshot = async (testId: string, testStepId: string, screenshotFile: File) => {
+    const data = new FormData();
+    data.append("file", screenshotFile);
+
     const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}/steps/${testStepId}/screenshots`, {
         method: "POST",
-        body: screenshotFile,
+        headers: {
+            "x-user-id": USER_ID,
+        },
+        body: data,
     });
 
     return response.json();
@@ -79,4 +86,4 @@ export const TakeScreenshotAndCreateStep = async (testId: string) => {
     await CreateTestStep(step);
     const screenshotFile = await takeScreenshot();
     await CreateTestStepScreenshot(testId, step.id, screenshotFile);
-}
+};

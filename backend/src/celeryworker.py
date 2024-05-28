@@ -19,6 +19,7 @@ if not DEBUG:
             "url": SQS_QUEUE_URL,
         }
     }
+    celery_config["broker_transport_options"]["is_secure"] = True
 
 celery_app = Celery(__name__, include=["jobs.tasks"])
 celery_app.config_from_object(celery_config)

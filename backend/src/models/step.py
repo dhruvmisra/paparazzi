@@ -32,4 +32,4 @@ class TestStepTable(BaseModel):
 
 
 if not TestStepTable.exists():
-    TestStepTable.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+    TestStepTable.create_table(read_capacity_units=5, write_capacity_units=5, wait=True)

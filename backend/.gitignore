@@ -26,4 +26,5 @@ faiss/
 *.csv
 venv/
 .envrc
+.env.production
 archive

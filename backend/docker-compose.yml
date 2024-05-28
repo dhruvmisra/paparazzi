@@ -6,6 +6,9 @@ services:
         container_name: backend
         env_file:
             - .env
+        environment:
+            - AWS_ACCESS_KEY_ID=dummy
+            - AWS_SECRET_ACCESS_KEY=dummy
         ports:
             - 3000:3000
         develop:
@@ -27,6 +30,9 @@ services:
         container_name: worker
         env_file:
             - .env
+        environment:
+            - AWS_ACCESS_KEY_ID=dummy
+            - AWS_SECRET_ACCESS_KEY=dummy
         network_mode: "host"
         depends_on:
             localstack:
@@ -43,13 +49,16 @@ services:
                   path: ./.env
                   target: /app/.env
 
-    cron:
+    scheduler:
         build:
             context: .
             dockerfile: ./docker/beat/Dockerfile
-        container_name: cron
+        container_name: scheduler
         env_file:
             - .env
+        environment:
+            - AWS_ACCESS_KEY_ID=dummy
+            - AWS_SECRET_ACCESS_KEY=dummy
         network_mode: "host"
         depends_on:
             localstack:
