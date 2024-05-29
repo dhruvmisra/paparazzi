@@ -5,8 +5,8 @@ from util.id import generate_test_run_id
 from .base import BaseModel
 
 
-class TestResultStep(ListAttribute):
-    testStepId = UnicodeAttribute()
+class TestResultStep(MapAttribute):
+    test_step_id = UnicodeAttribute()
     type = UnicodeAttribute()
     status = UnicodeAttribute()
     artifacts = ListAttribute(of=JSONAttribute)

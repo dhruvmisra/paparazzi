@@ -9,8 +9,8 @@ from .base import BaseSchema
 
 
 class TestDeviceInfoViewport(BaseSchema):
-    width: int
-    height: int
+    width: int = Field(..., alias="width", gt=0)
+    height: int = Field(..., alias="height", gt=0)
 
 
 class TestDeviceInfo(BaseSchema):
@@ -47,4 +47,4 @@ class UpdateTestRequest(BaseSchema):
     name: Optional[str] = None
     frequency: Optional[TestFrequency] = None
     base_url: Optional[str] = Field(None, alias="baseUrl")
-    state: Optional[TestState] = None
+

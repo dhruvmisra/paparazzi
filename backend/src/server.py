@@ -25,17 +25,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["OPTIONS", "GET", "POST", "PATCH", "PUT", "DELETE"],
-    allow_headers=[
-        "x-user-id",
-        "Authorization",
-        "Content-Type",
-        "Connection",
-        "User-Agent",
-        "Origin",
-        "Access-Control-Request-Method",
-    ],
+    allow_headers=["*"],
 )
 app.add_middleware(CorrelationIdMiddleware)
 add_security_headers(app)
