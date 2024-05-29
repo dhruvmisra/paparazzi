@@ -1,5 +1,6 @@
 import io
 
+from celery.schedules import crontab
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
 from playwright.sync_api import sync_playwright
@@ -11,10 +12,11 @@ from config import (
     SCREENSHOTS_S3_BUCKET_ENDPOINT,
     SCREENSHOTS_S3_BUCKET_NAME,
 )
-from constants import TestResultStatus, TestRunState, TestState, TestStepType
+from constants import TestFrequency, TestResultStatus, TestRunState, TestState, TestStepType
 from log import log
+from models import TestTable
 from repositories import TestRepository, TestRunRepository, TestStepRepository
-from schemas import TestRunResultStep
+from schemas import TestRunDBInput, TestRunResult, TestRunResultStep
 from util.id import get_user_test_id, separate_user_test_id
 from util.s3 import S3Helper
 
@@ -82,7 +84,9 @@ def run_test(user_test_id: str, run_id: str):
                             file_name=f"{step.id}.png",
                         )
                         if not existing_screenshot:
-                            artifact = {"error": f"Existing screenshot for step {step.id} not found"}
+                            artifact = {
+                                "error": f"Existing screenshot for step {step.id} not found"
+                            }
                             result_steps.append(
                                 TestRunResultStep(
                                     test_step_id=step.id,
@@ -98,7 +102,9 @@ def run_test(user_test_id: str, run_id: str):
                         new_image = Image.open(io.BytesIO(new_screenshot))
                         diff = pixelmatch(existing_image, new_image, None)
                         if diff > SCREENSHOT_DIFF_THRESHOLD:
-                            log.info(f"Screenshot diff for test {test_id}, run {run_id}, step {step.id}: {diff}")
+                            log.info(
+                                f"Screenshot diff for test {test_id}, run {run_id}, step {step.id}: {diff}"
+                            )
                             response = s3.upload_file(
                                 file_path=f"{user_id}/{test_id}/{run_id}",
                                 file_name=f"{step.id}.png",
@@ -197,8 +203,38 @@ def complete_test_recording(user_id: str, test_id: str):
     TestRepository().update(test, user_id, test_id)
 
 
+def queue_tests_to_run(tests):
+    for test in tests:
+        log.info(f"Queuing test run for user_id: {test.user_id}, test_id: {test.id}")
+        user_test_id = get_user_test_id(test.user_id, test.id)
+        data = TestRunDBInput(
+            user_test_id=user_test_id,
+            state=TestRunState.QUEUED,
+            result=TestRunResult(status=TestResultStatus.PENDING, steps=[]),
+        )
+        item = TestRunRepository().create(data)
+        run_test.apply_async(
+            (user_test_id, item.id),
+        )
+
+
+@celery_app.task(name="run_daily_tests")
+def run_daily_tests():
+    log.info("Running daily tests")
+    tests = TestTable.frequency_index.query(TestFrequency.DAILY.value)
+    queue_tests_to_run(tests)
+
+
+@celery_app.task(name="run_weekly_tests")
+def run_weekly_tests():
+    log.info("Running weekly tests")
+    tests = TestTable.frequency_index.query(TestFrequency.WEEKLY.value)
+    queue_tests_to_run(tests)
+
+
 @celery_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     log.info(f"Registering periodic tasks on {sender}")
-    # add periodic tasks here
+    sender.add_periodic_task(crontab(hour=12, minute=0), run_daily_tests)
+    sender.add_periodic_task(crontab(hour=12, minute=0, day_of_week=1), run_weekly_tests)
     log.info(f"Registered periodic tasks on {sender}")
