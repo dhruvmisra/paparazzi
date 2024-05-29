@@ -9,7 +9,7 @@ start:
 	@docker-compose up --force-recreate --remove-orphans
 
 watch:
-	@docker-compose watch --no-up & docker-compose up --force-recreate --remove-orphans
+	@docker-compose watch --no-up & docker-compose up worker scheduler localstack --force-recreate --remove-orphans
 
 rebuild:
 	@docker-compose build

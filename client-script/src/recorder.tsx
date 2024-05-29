@@ -5,13 +5,14 @@ import { constructClickStep, constructScrollStep, CreateTest, CreateTestStep } f
 import { debounce } from "./utils";
 import "./recorder.css";
 import { CompleteTest } from "./services/test";
-import { TakeScreenshotAndCreateStep, constructNavigationStep } from "./services/step";
+import { constructNavigationStep, constructScreenshotStep } from "./services/step";
 
 export function PaparazziRecorder() {
     const [recorderState, setRecorderState] = useLocalStorage("pprz-recorder-state", TestRecorderState.IDLE);
     const [testName, setTestName] = useLocalStorage("pprz-recorder-test-name", "");
     const [testFrequency, setTestFrequency] = useLocalStorage("pprz-recorder-test-frequency", TestFrequency.DAILY);
-    const [IsSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isVisible, _] = useLocalStorage("pprz-recorder-visible", true);
 
     const [currentTestId, setCurrentTestId] = useLocalStorage("pprz-recorder-current-test-id", "");
     // Required to use testId in event listeners
@@ -47,15 +48,17 @@ export function PaparazziRecorder() {
         console.log(testId.current);
         let step = constructClickStep(testId.current!, e);
         await CreateTestStep(step);
-        await TakeScreenshotAndCreateStep(testId.current!);
+        step = constructScreenshotStep(testId.current!);
+        await CreateTestStep(step);
     }, []);
 
     const handleGlobalScroll = useCallback(async (e: Event) => {
         console.log(e);
         console.log(testId.current);
-        const step = constructScrollStep(testId.current!, e);
+        let step = constructScrollStep(testId.current!, e);
         await CreateTestStep(step);
-        await TakeScreenshotAndCreateStep(testId.current!);
+        step = constructScreenshotStep(testId.current!);
+        await CreateTestStep(step);
     }, []);
 
     const addEventListeners = () => {
@@ -91,7 +94,7 @@ export function PaparazziRecorder() {
         setIsSettingsOpen(false);
     };
 
-    return (
+    return isVisible ? (
         <div className="pprz-recorder">
             <p className="pprz-title">PAPARAZZI</p>
             <div className="pprz-buttons">
@@ -119,7 +122,7 @@ export function PaparazziRecorder() {
 
                 <button
                     id="pprz-settings-btn"
-                    onClick={() => setIsSettingsOpen(!IsSettingsOpen)}
+                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                     disabled={recorderState === TestRecorderState.RECORDING}
                 >
                     <span className="icon" style="font-size: 1.6rem; line-height: 0">
@@ -127,7 +130,7 @@ export function PaparazziRecorder() {
                     </span>
                     Settings
                 </button>
-                <div id="pprz-settings" className={IsSettingsOpen ? "open" : ""}>
+                <div id="pprz-settings" className={isSettingsOpen ? "open" : ""}>
                     <form id="pprz-settings-form" onSubmit={handleSettingsSubmit}>
                         <input
                             type="text"
@@ -151,5 +154,5 @@ export function PaparazziRecorder() {
                 </div>
             </div>
         </div>
-    );
+    ) : <div></div>;
 }

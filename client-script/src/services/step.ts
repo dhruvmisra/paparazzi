@@ -1,6 +1,6 @@
 import { BACKEND_URL, USER_ID } from "../config";
 import { TestStep, TestStepType } from "../types";
-import { generateTestStepId, takeScreenshot } from "../utils";
+import { generateTestStepId } from "../utils";
 
 export const constructClickStep = (testId: string, event: MouseEvent): TestStep => {
     const step: TestStep = {
@@ -66,24 +66,3 @@ export const CreateTestStep = async (testStep: TestStep) => {
     return response.json() as Promise<TestStep>;
 };
 
-export const CreateTestStepScreenshot = async (testId: string, testStepId: string, screenshotFile: File) => {
-    const data = new FormData();
-    data.append("file", screenshotFile);
-
-    const response = await fetch(`${BACKEND_URL}/v1/tests/${testId}/steps/${testStepId}/screenshots`, {
-        method: "POST",
-        headers: {
-            "x-user-id": USER_ID,
-        },
-        body: data,
-    });
-
-    return response.json();
-};
-
-export const TakeScreenshotAndCreateStep = async (testId: string) => {
-    const step = constructScreenshotStep(testId);
-    await CreateTestStep(step);
-    const screenshotFile = await takeScreenshot();
-    await CreateTestStepScreenshot(testId, step.id, screenshotFile);
-};

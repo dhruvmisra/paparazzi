@@ -31,24 +31,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y curl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install playwright==1.44.0 && \
+    playwright install --with-deps
+
 COPY --from=dependencies /app/venv ./venv
 
 # copy project
 COPY . /app/
-
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
-RUN mkdir -p /var/log/paparazzi/osquery && \
-    chown -R appuser /var/log/paparazzi && \
-    chown -R appuser /var/log/paparazzi/osquery && \
-    mkdir -p /home/appuser && \
-    chown -R appuser /home/appuser && \
-    rm -rf /var/log/osquery && \
-    ln -sf /var/log/paparazzi/osquery /var/log/osquery
-
-VOLUME /var/log/paparazzi
-
-USER appuser
-EXPOSE 3000
 
 ARG COMMIT_SHA
 LABEL COMMIT_SHA=$COMMIT_SHA

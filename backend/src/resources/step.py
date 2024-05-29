@@ -38,7 +38,7 @@ async def create_test_step(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.get("/{test_id}/steps", response_model=List[TestStepResponse])
@@ -49,11 +49,12 @@ async def list_test_steps(
     try:
         log.info(f"Listing test steps for user_id: {user_id}, test_id: {test_id}")
         items = TestStepRepository().list(get_user_test_id(user_id, test_id))
-        return [TestStepResponse(**item.dict()) for item in items]
+        sorted_items = sorted(items, key=lambda x: x.created_at)
+        return [TestStepResponse(**item.dict()) for item in sorted_items]
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.get("/{test_id}/steps/{step_id}", response_model=TestStepResponse)
@@ -73,7 +74,7 @@ async def get_test_step(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.delete("/{test_id}/steps/{step_id}", status_code=204)
@@ -92,7 +93,7 @@ async def delete_test_step(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.post(
@@ -124,4 +125,5 @@ async def upload_test_step_screenshot(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
+

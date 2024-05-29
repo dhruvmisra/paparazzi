@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.signals import setup_logging
 from kombu import Queue
 
 from config import DEBUG, SQS_QUEUE_NAME, SQS_QUEUE_URL
@@ -23,3 +24,12 @@ if not DEBUG:
 
 celery_app = Celery(__name__, include=["jobs.tasks"])
 celery_app.config_from_object(celery_config)
+
+@setup_logging.connect
+def void(*args, **kwargs):
+    """Override celery's logging setup to prevent it from altering our settings.
+    github.com/celery/celery/issues/1867
+
+    :return void:
+    """
+    pass

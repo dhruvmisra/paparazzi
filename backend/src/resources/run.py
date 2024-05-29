@@ -39,8 +39,7 @@ async def queue_test_run(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        log.error(f"Error queuing test run: {e}")
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.get("/{test_id}/runs", response_model=List[TestRunResponse])
@@ -55,7 +54,7 @@ async def list_test_runs(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)
 
 
 @router.get("/{test_id}/runs/{run_id}", response_model=TestRunResponse)
@@ -73,4 +72,4 @@ async def get_test_run(
     except ApplicationException as e:
         raise e
     except Exception as e:
-        InternalServerException(e)
+        raise InternalServerException(e)

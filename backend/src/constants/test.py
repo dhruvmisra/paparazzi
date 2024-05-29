@@ -3,7 +3,8 @@ from enum import Enum
 
 class TestState(str, Enum):
     RECORDING = "RECORDING"
-    RECORDED = "RECORDED"
+    QUEUED = "QUEUED"
+    COMPLETED = "COMPLETED"
 
 
 class TestFrequency(str, Enum):

@@ -21,7 +21,7 @@ class S3Helper:
         response = self.s3_client.get_object(
             Bucket=self.bucket_name, Key=f"{file_path}/{file_name}"
         )
-        return response["Body"]
+        return response["Body"].read()
 
     def delete_file(self, file_path: str, file_name: str):
         response = self.s3_client.delete_object(
